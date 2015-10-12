@@ -1,0 +1,45 @@
+<!-- Example vector field type. To use the VectorQParser, you field name needs to contain the text 'vector' somewhere in the name -->
+<fieldType name="w2v_title_vectors" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">
+		<analyzer type="query">
+			<charFilter class="solr.HTMLStripCharFilterFactory" />
+			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
+			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+			
+			<filter class="solr.TrimFilterFactory" />
+			
+			<filter class="solr.SynonymFilterFactory" synonyms="jobs_titles.txt" ignoreCase="true"  tokenizerFactory="solr.WhitespaceTokenizerFactory"/>
+			<filter class="solr.TypeTokenFilterFactory" types="synonym_types.txt" useWhitelist="true"/>
+			
+			<!-- expand to vectors -->
+			<filter class="solr.SynonymFilterFactory" synonyms="title_vectors.txt" ignoreCase="true" expand="true" />
+			
+			<!-- extract payloads -->
+			<filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float" delimiter="|"/>
+			
+			<!-- collapse to mean vectors -->
+			<filter class="org.dice.solrenhancements.tokenfilters.MeanPayloadTokenFilterFactory"/>
+			<filter class="org.dice.solrenhancements.tokenfilters.PayloadQueryBoostTokenFilterFactory"/>
+		</analyzer>
+		<analyzer type="index">
+			<charFilter class="solr.HTMLStripCharFilterFactory" />
+
+			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
+			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+
+			<filter class="solr.TrimFilterFactory" />
+			<filter class="solr.SynonymFilterFactory" synonyms="jobs_titles.txt" ignoreCase="true"  tokenizerFactory="solr.WhitespaceTokenizerFactory"/>
+			
+			<filter class="solr.TypeTokenFilterFactory" types="synonym_types.txt" useWhitelist="true"/>			
+			
+			<!-- expand to vectors -->
+			<filter class="solr.SynonymFilterFactory" synonyms="title_vectors.txt" ignoreCase="true" expand="true" />
+			
+			<!-- extract payloads -->
+			<filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float" delimiter="|"/>
+			
+			<!-- collapse to mean vectors -->
+			<filter class="org.dice.solrenhancements.tokenfilters.MeanPayloadTokenFilterFactory"/>  
+		</analyzer>
+		<!-- Custom similarity class that recognizes payloads and ignores tf and idf for this field-->
+		<similarity class="org.dice.solrenhancements.similarity.PayloadOnlySimilarity"/>
+	</fieldType>

@@ -1,0 +1,38 @@
+<fieldType name="top10_title_vector_synonyms" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">
+		<analyzer type="query">
+			<charFilter class="solr.HTMLStripCharFilterFactory" />
+			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
+			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+			<filter class="solr.TrimFilterFactory" />
+
+			<filter class="solr.SynonymFilterFactory" synonyms="jobs_titles.txt" ignoreCase="true"  tokenizerFactory="solr.WhitespaceTokenizerFactory"/>
+			
+			<!-- filter to just tokens in the file above -->
+			<filter class="solr.TypeTokenFilterFactory" types="synonym_types.txt" useWhitelist="true"/>
+			
+			<!-- expand to top 10 terms weighted by similarity, at query time only -->
+			<!-- MAKE SURE ignorecase="false" !!!!!! --> 
+			<filter class="solr.SynonymFilterFactory" synonyms="top10_title_synonyms.txt" ignoreCase="false" expand="true" />
+			<!-- extract payloads -->
+			<filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float" delimiter="|"/>
+			<!-- maps payloads to term weights -->
+			<filter class="org.dice.solrenhancements.tokenfilters.PayloadQueryBoostTokenFilterFactory"/>
+			<filter class="solr.LengthFilterFactory" min="1" max="10000000" />
+		</analyzer>
+		
+		<!-- Index time config much simpler - just extract title terms -->
+		<analyzer type="index">
+		
+			<charFilter class="solr.HTMLStripCharFilterFactory" />
+			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
+			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+			<filter class="solr.TrimFilterFactory" />
+
+			<!-- filter to just tokens in the file above -->
+			<filter class="solr.SynonymFilterFactory" synonyms="jobs_titles.txt" ignoreCase="true"  tokenizerFactory="solr.WhitespaceTokenizerFactory"/>
+			
+			<filter class="solr.TypeTokenFilterFactory" types="synonym_types.txt" useWhitelist="true"/>
+			<filter class="solr.LengthFilterFactory" min="1" max="10000000" />
+		</analyzer>
+		<similarity class="org.dice.solrenhancements.similarity.PayloadOnlySimilarity"/>
+</fieldType>

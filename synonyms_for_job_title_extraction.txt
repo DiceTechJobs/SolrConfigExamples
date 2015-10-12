@@ -1,0 +1,26 @@
+# Example file used to extract job titles (from job_titles.txt). Our real file is much larger than this.
+# To use, configure this in a synonym filter, and then use a solr.TypeTokenFilterFactory to restrict tokens to the type synonym
+# solr will then parse out these terms. As this file contains multi-word synonyms, which solr doesn't handle well
+# you will want to use a special token filter and modified query parse (see https://lucidworks.com/blog/2014/07/12/solution-for-multi-term-synonyms-in-lucenesolr-using-the-auto-phrasing-tokenfilter/
+# for a description of the problem and one solution). The dice custom parsers (vector and queryboost) handle this issue also
+# see vector_field_type.xml and top_n_field_type.xml for example useage
+.net application developer=>.net_application_developer
+.net architect=>.net_architect
+.net developer=>.net_developer
+.net engineer=>.net_engineer
+.net programmer=>.net_programmer
+j2ee architect=>j2ee_architect
+j2ee developer=>j2ee_developer
+j2ee engineer=>j2ee_engineer
+j2ee softare developer=>j2ee_softare_developer
+j2ee software engineer=>j2ee_software_engineer
+java application developer=>java_application_developer
+hadoop admin=>hadoop_admin
+hadoop administrator=>hadoop_administrator
+hadoop architect=>hadoop_architect
+hadoop developer=>hadoop_developer
+project administrator=>project_administrator
+project analyst=>project_analyst
+project coordinator=>project_coordinator
+project engineer=>project_engineer
+project manager=>project_manager
