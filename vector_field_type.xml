@@ -40,6 +40,7 @@
 			<!-- collapse to mean vectors -->
 			<filter class="org.dice.solrenhancements.tokenfilters.MeanPayloadTokenFilterFactory"/>  
 		</analyzer>
-		<!-- Custom similarity class that recognizes payloads and ignores tf and idf for this field-->
+		<!-- Custom similarity class that recognizes payloads and ignores tf and idf for this field -->
+        <!-- Define <similarity class="solr.SchemaSimilarityFactory"/> as the similarity class in your schema.xml to configure per field type similarity -->
 		<similarity class="org.dice.solrenhancements.similarity.PayloadOnlySimilarity"/>
-	</fieldType>
+</fieldType>
