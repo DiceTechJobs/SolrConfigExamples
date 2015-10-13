@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!-- Cut down config skeleton illustrating how to configure dice solr plugins -->
+
+<config>
+  <!-- custom dice plugins. Place the jar file in a folder under your solr core directory, such as ./plugins -->
+  <lib dir="./plugins/" regex=".*\.jar" />
+
+    <!--  select requestHandler (not representative of our actual request handler)  -->
+   <requestHandler name="/select" class="solr.StandardRequestHandler">
+       <lst name="defaults">
+           <str name="indent">true</str>
+           <str name="wt">json</str>
+           <str name="qf">title^10 skills^8 description^5 company^20</str>
+           <str name="mm">-55%</str>
+           <str name="pf">title^25 skills^20</str>
+           <str name="pf2">title^15 skills^10</str>
+           <str name="df">text</str>
+           <str name="fl">title,skills,latlong,jobDescription,jobPostingDate</str>
+           
+           <!-- SPELL CHECKER -->
+           <str name="spellcheck.dictionary">default</str>
+           <str name="spellcheck">false</str>
+           <str name="spellcheck.extendedResults">false</str>           
+           <str name="spellcheck.count">5</str>
+           <str name="spellcheck.alternativeTermCount">20</str>
+           <!-- Max number of results to be returned for the query 
+          		before it stops generating suggestions -->
+           <!-- Don't use when doing fuzzy matching on a field
+           		<str name="spellcheck.maxResultsForSuggest">100</str>
+           -->
+           <str name="spellcheck.collate">true</str>
+           <str name="spellcheck.collateExtendedResults">true</str> 
+           <!-- 	This should be false, otherwise this really hurts results for rarer words
+			If left on, this will try and correct words that are correcly spelled but rare -->
+           <str name="spellcheck.onlyMorePopular">false</str>
+           <str name="spellcheck.maxCollationTries">10</str>
+           <str name="spellcheck.maxCollations">5</str>  
+           <!-- END SPELL CHECKER -->
+       </lst>
+       <arr name="last-components">
+           <str>spellcheck</str>
+       </arr>
+   </requestHandler>
+
+   <!-- Dice Custom MLT handler. (sample config, not the actual configuration) -->
+   <requestHandler name="/mlt" class="org.dice.solrenhancements.morelikethis.DiceMoreLikeThisHandler">
+        <lst name="defaults">
+            <str name="omitHeader">true</str>
+            <str name="wt">json</str>
+            <str name="indent">true</str>
+        
+        	<!-- Field(s) to return in the recommendations -->
+            <str  name="fl">id</str>
+            
+            <!-- Content stream logic - configure these parameters to extract terms from different parts of the content stream
+            	 using synonym filters followed by TypeFilter = synonym
+             -->
+            <str  name="stream.head.fl">title</str>
+            <str  name="stream.body.fl">skills,title</str>
+            <str  name="stream.qf">skills^2.0 title^2.5</str>
+
+			<!-- Fields to match over -->
+            <str  name="mlt.fl">title,skills</str>
+            <int  name="rows">10</int> <!-- number of recommendations -->
+            <int  name="mlt.maxflqt">5</int>   <!-- max terms to match PER FIELD -->
+            <bool name="mlt.boost">true</bool> <!-- boost matches (from solr mlt) recommended - true -->
+            
+            <!-- Relative field weights for matching fields (see mlt.fl) -->
+            <str  name="mlt.qf">skills^2.0 title^2.5</str>
+            
+            <!-- Normalize field weights to adhere to mlt.qf settings above 
+            (e.g. so that skills have a relative weighting of 2. to 2.5 for titles from mlt.qf above
+            -->
+            <bool name="mlt.normflboosts">true</bool>
+            
+            <!-- Log the term frequency values before using them to boost matches on -->
+            <bool name="mlt.logtf">true</bool>
+            
+            <!-- multiplicative boost. At query time we populate this with a geospatial boost
+            	e.g. a simplistic example - div(1.0,geodist(latlong,$locn)) where $locn is the lat long of the target job
+            -->
+            <str name="mlt.boostfn"></str>
+        </lst>
+   </requestHandler>
+   
+   <!-- Dice Unsupervised Feedback Handler. (sample config, not the actual configuration) -->
+   <requestHandler name="/ufselect" class="org.dice.solrenhancements.unsupervisedfeedback.DiceUnsupervisedFeedbackHandler">
+        <lst name="defaults">
+            <str name="omitHeader">true</str>
+            <str name="wt">json</str>
+            <str name="indent">true</str>
+
+			<!-- Fields to return -->
+            <str  name="fl">title,skills,state,city,location</str>
+            
+            <!-- Fields to match documents on (used for term expansion in second query, taking top most interesting terms) -->
+            <str  name="uf.fl">title,skills</str>
+            
+            <!-- Number of documents to return -->
+            <int  name="rows">10</int>
+            
+            <!-- Max terms per field to use in query expansion in second query -->
+            <int  name="uf.maxflqt">5</int>
+            
+            <!-- Boost relevancy. See regular solr mlt handler documentations. Recommended - true -->
+            <bool name="uf.boost">true</bool>
+            
+            <!-- Relative weighting to apply to each field from ufl.fl list -->
+            <str  name="uf.qf">skills^2.0 title^2.5</str>
+            
+            <!-- Display format for query expansion terms. See regular solr MLT handler documentation -->
+            <str  name="uf.interestingTerms">details</str>
+
+			<!-- Normalize query expansion term boosts to comply with uf.qf weightings. Recommended - true -->
+            <bool name="uf.normflboosts">true</bool>
+            
+            <!-- Log the term frequency values when apply to boost query expansion terms -->
+            <bool name="uf.logtf">true</bool>
+        </lst>
+    </requestHandler>
+    
+   <requestHandler name="/titleSuggest" class="org.apache.solr.handler.component.SearchHandler">
+     <lst name="defaults">
+       <str name="spellcheck">true</str>
+       <str name="spellcheck.dictionary">titleSuggest</str>
+       <!-- Sort most popular first -->
+       <str name="spellcheck.onlyMorePopular">true</str>
+       <!-- How many auto-complete entries do you want, max? --> 
+       <str name="spellcheck.count">10</str>
+       <str name="spellcheck.collate">false</str>
+       <str name="spellcheck.extendedResults">true</str>                
+     </lst>
+     <arr name="components">
+       <str>titleSuggest</str>
+     </arr>
+   </requestHandler>
+
+  <searchComponent name="spellcheck" class="org.dice.solrenhancements.spellchecker.DiceSpellCheckComponent">
+	<!-- anaylzer field to use at query time -->
+	<str name="queryAnalyzerFieldType">dice_spellcheck</str>
+	
+    <!-- note - multiple "Spell Checkers" can be declared and used by this component -->
+    <lst name="spellchecker">
+      <str name="name">default</str>
+      <str name="field">spellcheck</str>
+      <!-- a spellchecker built from a field of the main index -->
+      <str name="classname">org.dice.solrenhancements.spellchecker.DiceDirectSolrSpellChecker</str>
+      
+      <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
+      <str name="distanceMeasure">org.apache.lucene.search.spell.JaroWinklerDistance</str>
+
+      <!-- minimum accuracy needed to be considered a valid spellcheck suggestion -->
+      <float name="accuracy">0.5</float>
+      <!-- the maximum #edits we consider when enumerating terms: can be 1 or 2 -->
+      <int name="maxEdits">2</int>
+      <!-- the minimum shared prefix when enumerating terms -->
+      <int name="minPrefix">1</int>
+      <!-- maximum number of inspections per result. -->
+      <int name="maxInspections">50</int>
+      <!-- minimum length of a query (chars) to be considered for correction -->
+      <int name="minQueryLength">3</int>
+      <!-- maximum threshold of documents a query term can appear to be considered for correction -->
+      <!-- This is a threshold on the terms in the query. They have to appear below this threshold to be considered erroneous \ miss-spelled -->
+      <float name="maxQueryFrequency">50</float>
+	  <!-- Minimum frequency of tokens to be considered as corrections -->
+      <float name="thresholdTokenFrequency">10</float>
+      
+      <!-- score|freq|custom Comparator<SuggestWord> generally you want freq to avoid erroneous corrections -->
+      <str name="comparatorClass">freq</str>
+      
+      <!-- *** New parameter for DiceSolrSpellChecker ***
+      	 - File to store typo corrections in. Follows the synonym file format.
+	     - This path is RELATIVE to the core's configuration directory -->
+      <str name="typosFileName">typo_corrections.txt</str>
+      <str name="characterEncoding">UTF-8</str>
+    </lst>
+  </searchComponent>
+  
+  <searchComponent name="titleSuggest" class="solr.SpellCheckComponent">
+    <str name="queryAnalyzerFieldType">dice_autocomplete</str>
+    <!-- note - multiple "Spell Checkers" can be declared and used by this component -->
+
+    <lst name="spellchecker">
+      <str name="name">titleSuggest</str>
+      <str name="field">titleAutocomplete</str>
+      <!-- a spellchecker built from a field of the main index -->
+      <!-- ** Custome dice spell checker, tries different casings to look for a match - upper, lower and title casing ** -->
+      <str name="classname">org.dice.solrenhancements.spellchecker.DiceMultipleCaseSuggester</str>
+      <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.fst.WFSTLookupFactory</str>
+      <!-- Alternatives to lookupImpl: 
+           org.apache.solr.spelling.suggest.fst.FSTLookupFactory   [finite state automaton]
+           org.apache.solr.spelling.suggest.fst.WFSTLookupFactory [weighted finite state automaton]
+           org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory [default, jaspell-based]
+           org.apache.solr.spelling.suggest.tst.TSTLookupFactory   [ternary trees]
+      -->
+	  <float name="threshold">0.00005</float>
+      <str name="buildOnCommit">false</str>
+    </lst>
+  </searchComponent>
+
+  <!-- Request handler for spellchecker. Recommend you use in a lsast compoents of the main select handler instead -->
+  <requestHandler name="/spell" class="solr.SearchHandler" startup="lazy">
+    <lst name="defaults">
+      <str name="df">text_dice</str>
+      <!-- Solr will use suggestions from both the 'default' spellchecker
+           and from the 'wordbreak' spellchecker and combine them.
+           collations (re-written queries) can include a combination of
+           corrections from both spellcheckers -->
+      <str name="spellcheck.dictionary">default</str>
+      <str name="spellcheck.dictionary">wordbreak</str>
+      <str name="spellcheck">on</str>
+      <str name="spellcheck.extendedResults">true</str>       
+      <str name="spellcheck.count">10</str>
+      <str name="spellcheck.alternativeTermCount">5</str>
+      <str name="spellcheck.maxResultsForSuggest">5</str>       
+      <str name="spellcheck.collate">true</str>
+      <str name="spellcheck.collateExtendedResults">true</str>  
+      <str name="spellcheck.maxCollationTries">10</str>
+      <str name="spellcheck.maxCollations">5</str>         
+    </lst>
+    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>
+  </requestHandler>
+
+</config>
