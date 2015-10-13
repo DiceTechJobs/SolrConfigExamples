@@ -5,5 +5,5 @@ See https://github.com/DiceTechJobs/SolrPlugins for Dice Solr Plugins referenced
 
 See https://github.com/DiceTechJobs/ConceptualSearch for python scripts to generate the synonym files used in conceptual search
 
-This repository includes some samples of the synonym files used in configuring conceptual search for solr (see Lucene Revolution talk 2015 http://lucenerevolution.org/sessions/implementing-conceptual-search-in-solr-using-lsa-and-word2vec/)
-as well as example analysis chains for term extraction and vector expansion.
+This repository includes some samples of the synonym files used in configuring conceptual search for solr as well as example analysis chains for term extraction and vector expansion
+  * see Lucene Revolution talk 2015 http://lucenerevolution.org/sessions/implementing-conceptual-search-in-solr-using-lsa-and-word2vec/
