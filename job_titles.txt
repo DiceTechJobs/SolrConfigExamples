@@ -1,4 +1,4 @@
-# Example file used to extract job titles (from job_titles.txt). Our real file is much larger than this.
+# Example file used to extract job titles (from job_titles.txt). Our real file is much larger than this :)
 # To use, configure this in a synonym filter, and then use a solr.TypeTokenFilterFactory to restrict tokens to the type synonym
 # solr will then parse out these terms. As this file contains multi-word synonyms, which solr doesn't handle well
 # you will want to use a special token filter and modified query parse (see https://lucidworks.com/blog/2014/07/12/solution-for-multi-term-synonyms-in-lucenesolr-using-the-auto-phrasing-tokenfilter/
