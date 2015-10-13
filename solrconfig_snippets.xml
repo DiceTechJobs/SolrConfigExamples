@@ -69,6 +69,13 @@
             <str name="wt">json</str>
             <str name="indent">true</str>
         
+        	<!-- Query parameter, override at query time - specify a query that matches one or more documents. 
+        	     This document(s) are used to generate recommendations - similar documents based on matching 'interesting terms'
+        	     Note: Can handle More Like THESE functionality - generate recommendations from a set of documents, not just one
+        	     Can be used to generate recommendations from a user's browsing history, for example.
+        	-->
+        	<str name="q">id:12345567889</str>
+        
         	<!-- Field(s) to return in the recommendations -->
             <str  name="fl">id</str>
             
@@ -110,13 +117,28 @@
             <str name="wt">json</str>
             <str name="indent">true</str>
 
+			<!-- Query parameter, override at query time - specify a query that matches one or more documents. 
+        	     This document(s) are used to generate recommendations - similar documents based on matching 'interesting terms'
+        	     Note: Can handle More Like THESE functionality - generate recommendations from a set of documents, not just one
+        	     Can be used to generate recommendations from a user's browsing history, for example.
+        	-->
+        	<str name="q">id:12345567889</str>
+
 			<!-- Fields to return -->
             <str  name="fl">title,skills,state,city,location</str>
             
             <!-- Fields to match documents on (used for term expansion in second query, taking top most interesting terms) -->
             <str  name="uf.fl">title,skills</str>
             
-            <!-- Number of documents to return -->
+            <!-- The Maximum number of documents matching the query defined in the q parameter, to use to extract terms from for query time expansion -->
+            <!-- This limits the size of the result set for the first query, not the second (see traditional rows parameter to limit the second) -->
+            <str  name="uf.maxdocs">10</str>
+            
+            <!-- Include the matches from the first query in the result set in a separate match section? -->
+            <!-- Recommended - Turn on for debugging and analysis, but leave off for production use -->
+            <str name="uf.match.include">false</str>
+            
+            <!-- Number of documents to return to the caller (from the second query) -->
             <int  name="rows">10</int>
             
             <!-- Max terms per field to use in query expansion in second query -->
