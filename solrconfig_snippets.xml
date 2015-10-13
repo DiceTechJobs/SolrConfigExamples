@@ -19,8 +19,11 @@
 <!-- Cut down config skeleton illustrating how to configure dice solr plugins -->
 
 <config>
-  <!-- custom dice plugins. Place the jar file in a folder under your solr core directory, such as ./plugins -->
-  <lib dir="./plugins/" regex=".*\.jar" />
+
+   <!-- Custom dice plugins. Place the SolrEnhancements.jar file in a folder under your solr core directory, such as ./plugins 
+   		and point this to it
+   -->
+   <lib dir="./plugins/" regex=".*\.jar" />
 
     <!--  select requestHandler (not representative of our actual request handler)  -->
    <requestHandler name="/select" class="solr.StandardRequestHandler">
@@ -240,5 +243,19 @@
       <str>spellcheck</str>
     </arr>
   </requestHandler>
+  
+  <!-- Custom Query Parsers that extend the edismax parers -->
+
+  <!-- Extension of edismax to include payload values in the relevancy score calculation -->
+  <!-- Also requires custom similarity class implementation to take advantage of this (e.g. dice's PayloadAwareDefaultSimilarity) -->
+  <queryParser name="payloadEdismax" class="org.dice.solrenhancements.queryparsers.PayloadAwareExtendedDismaxQParserPlugin"/>
+  
+  <!-- Handles expansion of terms to vector representations at query and index time. 
+  	   Handles solr multi-word synonym issue by replacing spaces with comma's - must ensure analysis chain tokenizes on commas for this to work -->
+  <queryParser name="vector" 		 class="org.dice.solrenhancements.queryparsers.VectorQParserPlugin"/>
+  
+  <!-- Handles expansion of terms to list of payload boosted query expansion terms at query time. 
+  	   Handles solr multi-word synonym issue by replacing spaces with comma's - must ensure analysis chain tokenizes on commas for this to work -->
+  <queryParser name="queryboost"     class="org.dice.solrenhancements.queryparsers.QueryBoostingQParserPlugin"/>
 
 </config>

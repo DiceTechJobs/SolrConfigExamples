@@ -1,6 +1,7 @@
 <fieldType name="top10_title_vector_synonyms" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">
 		<analyzer type="query">
 			<charFilter class="solr.HTMLStripCharFilterFactory" />
+			<!-- MUST HAVE comma's mapped to spaces in here - required by vector and queryboost parsers -->
 			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
 			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
 			<filter class="solr.TrimFilterFactory" />
@@ -24,6 +25,7 @@
 		<analyzer type="index">
 		
 			<charFilter class="solr.HTMLStripCharFilterFactory" />
+			<!-- MUST HAVE comma's mapped to spaces in here - required by vector and queryboost parsers -->
 			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
 			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
 			<filter class="solr.TrimFilterFactory" />
