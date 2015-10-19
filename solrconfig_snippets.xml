@@ -177,6 +177,7 @@
      </arr>
    </requestHandler>
 
+
   <searchComponent name="spellcheck" class="org.dice.solrenhancements.spellchecker.DiceSpellCheckComponent">
 	<!-- anaylzer field to use at query time -->
 	<str name="queryAnalyzerFieldType">dice_spellcheck</str>
@@ -218,6 +219,7 @@
     </lst>
   </searchComponent>
   
+  <!-- Multiple Case Suggester -->
   <searchComponent name="titleSuggest" class="solr.SpellCheckComponent">
     <str name="queryAnalyzerFieldType">dice_autocomplete</str>
     <!-- note - multiple "Spell Checkers" can be declared and used by this component -->
@@ -226,7 +228,7 @@
       <str name="name">titleSuggest</str>
       <str name="field">titleAutocomplete</str>
       <!-- a spellchecker built from a field of the main index -->
-      <!-- ** Custome dice spell checker, tries different casings to look for a match - upper, lower and title casing ** -->
+      <!-- ** Custom dice spell checker, tries different casings to look for a match - upper, lower and title casing ** -->
       <str name="classname">org.dice.solrenhancements.spellchecker.DiceMultipleCaseSuggester</str>
       <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
       <str name="lookupImpl">org.apache.solr.spelling.suggest.fst.WFSTLookupFactory</str>
@@ -239,6 +241,31 @@
 	  <float name="threshold">0.00005</float>
       <str name="buildOnCommit">false</str>
     </lst>
+  </searchComponent>
+  
+  <searchComponent name="skillSuggest" class="solr.SpellCheckComponent">
+    <str name="queryAnalyzerFieldType">skills_autocomplete</str>
+    <!-- not - multiple "Spell Checkers" can be declared and used by this component -->
+
+    <lst name="spellchecker">
+      <str name="name">skillSuggest</str>
+      <str name="field">skillAutocomplete</str>
+      <str name="suggestionAnalyzerFieldTypeName">skills_from_text</str>
+      <!-- a spellchecker built from a field of the main index -->
+      <str name="classname">org.dice.solrenhancements.spellchecker.DiceSuggester</str>
+      <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.fst.WFSTLookupFactory</str>
+      <!-- Alternatives to lookupImpl: 
+           org.apache.solr.spelling.suggest.fst.FSTLookupFactory   [finite state automaton]
+           org.apache.solr.spelling.suggest.fst.WFSTLookupFactory [weighted finite state automaton]
+           org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory [default, jaspell-based]
+           org.apache.solr.spelling.suggest.tst.TSTLookupFactory   [ternary trees]
+      -->
+	  <float name="threshold">0.00005</float>
+      <str name="buildOnCommit">false</str>
+      <str name="sourceLocation">skill_counts_A.txt,skill_counts_B.txt,skill_counts_C.txt,skill_counts_D.txt</str>
+    </lst>
+    
   </searchComponent>
 
   <!-- Request handler for spellchecker. Recommend you use in a lsast compoents of the main select handler instead -->
