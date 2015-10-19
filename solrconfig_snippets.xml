@@ -80,7 +80,16 @@
             <str  name="fl">id</str>
             
             <!-- Content stream logic - configure these parameters to extract terms from different parts of the content stream
-            	 using synonym filters followed by TypeFilter = synonym
+            	 using synonym filters followed by TypeFilter = synonym. 
+            	 This allows you to pass in an enture document to generate recommendations from that is NOT in the index. For instance,
+            	 an employer could paste in a job description from their own site and we can generate matching job seekers.
+            	 
+            	 To use - at query time, don't specify a q parameter, but populate the stream.head and stream.body parameters instead.
+            	 You can use either or both, the reason for 2 parameters is so you can apply different analysis chains to each parameter value separately.
+            	 Handles content streams (see regular solr mlt handler). 
+            	 Recommended useage - use an analysis chain to extract important keywords from your domain. 
+            	 One approach is to use a synonym filter to detect keywords, followed by a type filter (type=SYNONYM) to do this. 
+            	 Another is to use the solr text tagger plugin.
              -->
             <str  name="stream.head.fl">title</str>
             <str  name="stream.body.fl">skills,title</str>
