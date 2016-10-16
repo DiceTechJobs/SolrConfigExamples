@@ -1,5 +1,5 @@
-# SolrConfigExamples
-Examples of solr config entries for Dice.com solr plugins and conceptual search functionality.
+# DiceTechJobs - Solr Config Examples
+Examples of solr config entries for Dice.com solr plugins and conceptual search functionality, by Simon Hughes ( Dice Data Scientist ).
 
 See https://github.com/DiceTechJobs/SolrPlugins for Dice Solr Plugins referenced in these configs
 
